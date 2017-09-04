@@ -49,19 +49,19 @@ public class MainActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK) {
             if (requestCode == REQUEST_TAKE_GALLERY_VIDEO) {
                 Uri selectedImageUri = data.getData();
-                final String selectedImagePath = getPath(selectedImageUri);
+                final String selectedPath = getPath(selectedImageUri);
 
-                ((TextView) findViewById(R.id.tv)).setText(selectedImagePath);
+                ((TextView) findViewById(R.id.tv)).setText(selectedPath);
 
                 try {
-                    int duration = mVideoProcessing.getDuration(selectedImagePath);
+                    int duration = mVideoProcessing.getDuration(selectedPath);
                     mRangeBar.setTickEnd(duration);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
 
 
-                mVideoView.setVideoPath(selectedImagePath);
+                mVideoView.setVideoPath(selectedPath);
 
                 mVideoView.setMediaController(new MediaController(this));
                 mVideoView.seekTo(100);
@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
                 findViewById(R.id.btnTrim).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        final String output = new File(new File(selectedImagePath).getParent(), "trimmed.mp4").toString();
+                        final String output = new File(new File(selectedPath).getParent(), "trimmed.mp4").toString();
                         final ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
                         progressDialog.show();
                         new Thread() {
@@ -77,7 +77,9 @@ public class MainActivity extends AppCompatActivity {
                             public void run() {
                                 super.run();
                                 try {
-                                    mVideoProcessing.trim(selectedImagePath, output, mRangeBar.getLeftIndex(), mRangeBar.getRightIndex());
+                                    mVideoProcessing.trim(selectedPath, output, mRangeBar.getLeftIndex(), mRangeBar.getRightIndex());
+
+                                    mVideoProcessing.speedOfVideo(selectedPath, output, 2);
                                     runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
@@ -100,63 +102,11 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-              //  MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
-             //   mediaMetadataRetriever.setDataSource(selectedImagePath);
 
-              //  try {
-              //      Bitmap bitmap = mediaMetadataRetriever.getFrameAtTime(15000000);
-
-             //   findViewById(R.id.btnTrim).setBackgroundDrawable(new BitmapDrawable(bitmap));
-
-
-                //"/storage/emulated/0/DCIM/Video/V70815-205742.mp4"
-                // "/storage/emulated/0/Recorder/gggg.mp3";
-//                if (selectedImagePath != null) {
-//                    new Thread(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            String output = getBaseName(selectedImagePath) + "1.mp4";
-//                            try {
-//                                videoProcessing.rotateDisplayMatrix(selectedImagePath, output, 270.0);
-//                                //videoProcessing.trim(selectedImagePath, output, 3.0, 9.3);
-//                            //try {
-//                               // videoProcessing.getDuration(selectedImagePath);
-//                            } catch (Exception e) {
-//                                e.printStackTrace();
-//                            }
-//                                //videoProcessing.mergeAudioWithVideoWithoutTranscoding("/storage/emulated/0/DCIM/Video/V70815-205742.mp4", selectedImagePath, output);
-//                           // } catch (IOException e) {
-//                          //      e.printStackTrace();
-//                         //   }
-//                            //   trim(selectedImagePath, output, 1.0, 3.3);
-//                            //rotate(selectedImagePath, output, 360);
-//                            try {
-//                                //r(selectedImagePath, output);
-//                                //     speed(selectedImagePath, output, coef);
-//                            } catch (Exception e) {
-//                                e.printStackTrace();
-//                            }
-//
-//                            Intent intent = new Intent();
-//                            intent.setAction(Intent.ACTION_VIEW);
-//                            intent.setDataAndType(Uri.fromFile(new File(output).getParentFile()), "resource/folder");
-//                            startActivity(intent);
-//                        }
-//                    }).start();
-//                }
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
-
-//    public static String getBaseName(String fileName) {
-//        int index = fileName.lastIndexOf('.');
-//        if (index == -1) {
-//            return fileName;
-//        } else {
-//            return fileName.substring(0, index);
-//        }
-//    }
 
     public String getPath(Uri uri) {
         String[] projection = {MediaStore.Video.Media.DATA};
